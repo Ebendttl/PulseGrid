@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { setAuditDrawerOpen, setSelectedClassId } from "@/store/attendanceSlice";
+import { setSelectedClassId, setAuditDrawerOpen } from "@/store/attendanceSlice";
 import { apiClient } from "@/lib/apiClient";
+import { formatCurrency, formatDate, formatPercentage } from "@/lib/formatters";
 import { Student, ClassSession, AttendanceRecord, AttendanceStatus, AuditLog } from "@/types/domain";
 import { toast } from "sonner";
 import {

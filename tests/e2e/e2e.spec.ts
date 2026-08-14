@@ -7,12 +7,10 @@ test.describe("PulseGrid End-to-End Critical Flows & Accessibility", () => {
   }) => {
     // 1. Visit Login Page
     await page.goto("/login");
-    await expect(page.locator("h1, h2, h3, h4")).toContainText([
-      "Demo Access Portal",
-      "PulseGrid",
-    ]);
+    await expect(page.getByText("Demo Access Portal")).toBeVisible();
+    await expect(page.getByText("PulseGrid", { exact: true })).toBeVisible();
 
-    // 2. Accessibility Scan on Login
+    // 2. Accessibility Scan on Login Page
     const loginAxeResults = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa"])
       .analyze();
@@ -25,9 +23,9 @@ test.describe("PulseGrid End-to-End Critical Flows & Accessibility", () => {
     // 3. Login as Admin
     await page.click("text=Launch as ADMIN");
     await page.waitForURL("/dashboard");
-    await expect(page.locator("h1")).toContainText("Operational Grid");
+    await expect(page.getByText("Operational Grid")).toBeVisible();
 
-    // 4. Accessibility Scan on Dashboard
+    // 4. Accessibility Scan on Dashboard Page
     const dashboardAxeResults = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa"])
       .analyze();
@@ -37,20 +35,20 @@ test.describe("PulseGrid End-to-End Critical Flows & Accessibility", () => {
       )
     ).toHaveLength(0);
 
-    // 5. Navigate to Attendance
+    // 5. Navigate to Attendance Module
     await page.goto("/attendance");
-    await expect(page.locator("h1")).toContainText("Class Register");
+    await expect(page.getByText("Class Register & Attendance")).toBeVisible();
 
-    // 6. Navigate to Fees
+    // 6. Navigate to Fees Module
     await page.goto("/fees");
-    await expect(page.locator("h1")).toContainText("Fees & Finance Portal");
+    await expect(page.getByText("Fees & Finance Portal")).toBeVisible();
 
-    // 7. Navigate to Timetable
+    // 7. Navigate to Timetable Module
     await page.goto("/timetable");
-    await expect(page.locator("h1")).toContainText("Weekly Timetable Grid");
+    await expect(page.getByText("Weekly Timetable Grid")).toBeVisible();
 
-    // 8. Navigate to Notifications
+    // 8. Navigate to Notifications Module
     await page.goto("/notifications");
-    await expect(page.locator("h1")).toContainText("Digital Noticeboard");
+    await expect(page.getByText("Digital Noticeboard")).toBeVisible();
   });
 });

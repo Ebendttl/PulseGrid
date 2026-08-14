@@ -32,11 +32,11 @@ describe("apiClient Interceptors", () => {
   });
 
   it("handles 401 response interceptor in browser environment", async () => {
-    delete (window as unknown as { location: unknown }).location;
-    window.location = {
-      href: "",
-      pathname: "/dashboard",
-    } as unknown as Location;
+    const locationMock = { href: "", pathname: "/dashboard" };
+    Object.defineProperty(window, "location", {
+      writable: true,
+      value: locationMock,
+    });
 
     mock.onGet("/unauth").reply(401);
 

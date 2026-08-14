@@ -14,7 +14,6 @@ import {
   Bell,
   User,
   X,
-  Shield,
 } from "lucide-react";
 
 export const NAV_ITEMS = [

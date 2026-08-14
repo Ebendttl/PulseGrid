@@ -28,9 +28,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       if (window.location.pathname !== "/login") {
-        window.location.href = `/login?redirect=${encodeURIComponent(
-          window.location.pathname
-        )}`;
+        window.location.assign(
+          `/login?redirect=${encodeURIComponent(window.location.pathname)}`
+        );
       }
     }
     return Promise.reject(error);

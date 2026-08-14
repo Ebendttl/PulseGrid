@@ -2,27 +2,24 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { switchRole, logout } from "@/store/authSlice";
 import { setMobileSidebarOpen } from "@/store/uiSlice";
 import { Role } from "@/types/domain";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Activity,
   Sun,
   Moon,
   LogOut,
-  User,
-  Shield,
-  GraduationCap,
-  BookOpen,
   WifiOff,
   Menu,
 } from "lucide-react";
 
 export function Navbar() {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const dispatch = useAppDispatch();
   const { user, role } = useAppSelector((state) => state.auth);
@@ -37,7 +34,7 @@ export function Navbar() {
     document.cookie = "pg_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     localStorage.removeItem("pg_auth_token");
     dispatch(logout());
-    window.location.href = "/login";
+    router.push("/login");
   };
 
   return (

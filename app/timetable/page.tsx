@@ -3,8 +3,7 @@
 import React, { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAppDispatch, useAppSelector } from "@/store";
@@ -18,7 +17,6 @@ import {
   MapPin,
   User,
   AlertTriangle,
-  CheckCircle2,
   Sparkles,
 } from "lucide-react";
 

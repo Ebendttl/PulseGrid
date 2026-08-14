@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setSelectedClassId, setAuditDrawerOpen } from "@/store/attendanceSlice";
 import { apiClient } from "@/lib/apiClient";
-import { formatCurrency, formatDate, formatPercentage } from "@/lib/formatters";
+import { formatPercentage } from "@/lib/formatters";
 import { Student, ClassSession, AttendanceRecord, AttendanceStatus, AuditLog } from "@/types/domain";
 import { toast } from "sonner";
 import {
@@ -21,8 +21,6 @@ import {
   Search,
   History,
   AlertCircle,
-  Filter,
-  CheckCircle2,
   Calendar,
 } from "lucide-react";
 

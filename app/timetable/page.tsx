@@ -30,7 +30,7 @@ const DAYS_OF_WEEK: DayOfWeek[] = [
 
 export default function TimetablePage() {
   const dispatch = useAppDispatch();
-  const { selectedDay, showConflictsOnly } = useAppSelector((state) => state.schedule);
+  const { selectedDay } = useAppSelector((state) => state.schedule);
 
   // Queries
   const { data: sessions = [], isLoading } = useQuery<ClassSession[]>({

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { apiClient } from "@/lib/apiClient";
 import AxiosMockAdapter from "axios-mock-adapter";
 
@@ -32,10 +32,13 @@ describe("apiClient Interceptors", () => {
   });
 
   it("handles 401 response interceptor in browser environment", async () => {
-    const locationMock = { href: "", pathname: "/dashboard" };
+    const assignMock = vi.fn();
     Object.defineProperty(window, "location", {
       writable: true,
-      value: locationMock,
+      value: {
+        pathname: "/dashboard",
+        assign: assignMock,
+      },
     });
 
     mock.onGet("/unauth").reply(401);
@@ -46,6 +49,8 @@ describe("apiClient Interceptors", () => {
       // Expected rejection
     }
 
-    expect(window.location.href).toContain("/login");
+    expect(assignMock).toHaveBeenCalledWith(
+      "/login?redirect=%2Fdashboard"
+    );
   });
 });

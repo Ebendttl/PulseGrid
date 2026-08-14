@@ -8,13 +8,13 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-pg-signal-blue/10 text-pg-signal-blue dark:bg-pg-signal-blue/20 dark:text-blue-300",
+          "border-transparent bg-pg-signal-blue/15 text-[#1E40AF] dark:bg-pg-signal-blue/20 dark:text-blue-300",
         success:
-          "border-transparent bg-pg-pulse-teal/10 text-pg-pulse-teal dark:bg-pg-pulse-teal/20 dark:text-teal-300",
+          "border-transparent bg-pg-pulse-teal/15 text-[#065F46] dark:bg-pg-pulse-teal/20 dark:text-teal-300",
         warning:
-          "border-transparent bg-pg-alert-amber/10 text-pg-alert-amber dark:bg-pg-alert-amber/20 dark:text-amber-300",
+          "border-transparent bg-pg-alert-amber/15 text-[#854D0E] dark:bg-pg-alert-amber/20 dark:text-amber-300",
         destructive:
-          "border-transparent bg-pg-risk-red/10 text-pg-risk-red dark:bg-pg-risk-red/20 dark:text-red-300",
+          "border-transparent bg-pg-risk-red/15 text-[#991B1B] dark:bg-pg-risk-red/20 dark:text-red-300",
         outline: "border border-pg-line text-pg-ink",
         muted: "bg-pg-paper text-pg-muted border border-pg-line/60",
       },

@@ -6,10 +6,10 @@
   --pg-surface: #FFFFFF;
   --pg-line: #E1E4E1;
   --pg-signal-blue: #1D4ED8;
-  --pg-pulse-teal: #0F9D8C;
-  --pg-alert-amber: #C77D14;
-  --pg-risk-red: #C0362C;
-  --pg-muted: #6B7280;
+  --pg-pulse-teal: #0D7A6D;
+  --pg-alert-amber: #9A5B00;
+  --pg-risk-red: #B91C1C;
+  --pg-muted: #4B5563;
 
   --background: var(--pg-paper);
   --foreground: var(--pg-ink);

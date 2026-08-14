@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAppSelector } from "@/store";
 import { formatCurrency, formatPercentage } from "@/lib/formatters";
 import { calculateRuleBasedRisk } from "@/lib/riskEngine";
-import { Student, Invoice, Announcement, ClassSession, AttendanceRecord } from "@/types/domain";
+import { Student, Invoice, Announcement, ClassSession } from "@/types/domain";
 import { apiClient } from "@/lib/apiClient";
 import {
   Activity,
@@ -49,13 +49,8 @@ export default function DashboardPage() {
     queryFn: async () => (await apiClient.get("/classSessions")).data,
   });
 
-  const { data: attendance = [], isLoading: loadingAttendance } = useQuery<AttendanceRecord[]>({
-    queryKey: ["attendanceRecords"],
-    queryFn: async () => (await apiClient.get("/attendanceRecords")).data,
-  });
-
   const isLoading =
-    loadingStudents || loadingInvoices || loadingAnnouncements || loadingSessions || loadingAttendance;
+    loadingStudents || loadingInvoices || loadingAnnouncements || loadingSessions;
 
   // Derived aggregates
   const totalOverdueFees = invoices

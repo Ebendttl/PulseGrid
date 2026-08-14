@@ -25,6 +25,17 @@ export const metadata: Metadata = {
   title: "PulseGrid — The heartbeat of your campus, in one grid",
   description:
     "Production-grade Mini Student Information Management System (Mini-SIMS) for school administrators, teachers, and students.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/icon.svg",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

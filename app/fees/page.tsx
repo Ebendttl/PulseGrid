@@ -39,6 +39,11 @@ const paymentSchema = z.object({
 
 type PaymentFormData = z.infer<typeof paymentSchema>;
 
+// Helper function outside component for pure default reference code
+function generateRefCode(): string {
+  return `PAY-${Math.floor(100000 + Math.random() * 900000)}`;
+}
+
 export default function FeesPage() {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
@@ -51,7 +56,7 @@ export default function FeesPage() {
   const [pdfError, setPdfError] = useState(false);
 
   // Queries
-  const { data: invoices = [], isLoading: loadingInvoices } = useQuery<Invoice[]>({
+  const { data: invoices = [] } = useQuery<Invoice[]>({
     queryKey: ["invoices"],
     queryFn: async () => (await apiClient.get("/invoices")).data,
   });
@@ -90,7 +95,7 @@ export default function FeesPage() {
     defaultValues: {
       amount: selectedInvoice ? selectedInvoice.amount - selectedInvoice.amountPaid : 100,
       paymentMethod: "Credit Card",
-      reference: `PAY-${Math.floor(100000 + Math.random() * 900000)}`,
+      reference: "PAY-100204",
     },
   });
 
@@ -142,7 +147,7 @@ export default function FeesPage() {
   const handleOpenPaymentModal = (invoice: Invoice) => {
     dispatch(setSelectedInvoiceId(invoice.id));
     setValue("amount", invoice.amount - invoice.amountPaid);
-    setValue("reference", `PAY-${Math.floor(100000 + Math.random() * 900000)}`);
+    setValue("reference", generateRefCode());
     dispatch(setPaymentModalOpen(true));
   };
 

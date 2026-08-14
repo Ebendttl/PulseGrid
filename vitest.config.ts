@@ -5,19 +5,22 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "jsdom",
+    environment: "happy-dom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     alias: {
-      "@": path.resolve(__dirname, "./"),
+      "@": path.resolve(import.meta.dirname, "./"),
     },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      lines: 85,
-      branches: 80,
-      functions: 85,
-      statements: 85,
+      thresholds: {
+        lines: 85,
+        branches: 80,
+        functions: 85,
+        statements: 85,
+      },
     },
   },
 });
+

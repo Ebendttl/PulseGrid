@@ -2,12 +2,12 @@
 
 import React from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAppSelector } from "@/store";
-import { User, Shield, Mail, Phone, Lock, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProfilePage() {

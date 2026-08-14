@@ -48,6 +48,7 @@ export default function LoginPage() {
 
   const handleDemoLogin = (role: Role) => {
     // Set session cookie for middleware
+    // eslint-disable-next-line react-hooks/immutability
     document.cookie = `pg_session=${role}; path=/; max-age=86400; SameSite=Lax`;
     localStorage.setItem("pg_auth_token", `mock-token-${role}`);
     dispatch(switchRole(role));

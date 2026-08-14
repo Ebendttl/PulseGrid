@@ -19,13 +19,8 @@ import { formatCurrency, formatDate } from "@/lib/formatters";
 import { toast } from "sonner";
 import {
   CreditCard,
-  CheckCircle,
-  AlertTriangle,
   FileText,
-  DollarSign,
   Download,
-  Plus,
-  ArrowUpRight,
   ShieldCheck,
   RefreshCw,
 } from "lucide-react";

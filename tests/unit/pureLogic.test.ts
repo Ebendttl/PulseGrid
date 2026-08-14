@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { calculateRuleBasedRisk, getRiskInsight } from "@/lib/riskEngine";
 import {
   timeToMinutes,
@@ -10,9 +10,10 @@ import {
   formatPercentage,
   formatDate,
 } from "@/lib/formatters";
+import { apiClient } from "@/lib/apiClient";
 import { Student, ClassSession } from "@/types/domain";
 
-describe("Risk Engine Math", () => {
+describe("Risk Engine Math & Service", () => {
   const baseStudent: Student = {
     id: "std-test-1",
     name: "Test Student",
@@ -26,9 +27,15 @@ describe("Risk Engine Math", () => {
     email: "test@pulsegrid.edu",
   };
 
+  const originalEnv = process.env.NEXT_PUBLIC_AI_MODE;
+
+  afterEach(() => {
+    process.env.NEXT_PUBLIC_AI_MODE = originalEnv;
+    vi.restoreAllMocks();
+  });
+
   it("calculates low risk tier correctly for high attendance & paid fees", () => {
     const result = calculateRuleBasedRisk(baseStudent);
-    // score = (1 - 0.95)*0.5 + 0.0*0.3 + 0.02*0.2 = 0.025 + 0 + 0.004 = 0.029
     expect(result.tier).toBe("low");
     expect(result.overallScore).toBeLessThan(0.12);
   });
@@ -36,9 +43,9 @@ describe("Risk Engine Math", () => {
   it("calculates medium risk tier correctly at threshold (>= 0.12)", () => {
     const mediumStudent: Student = {
       ...baseStudent,
-      attendanceRate: 0.8, // (0.2 * 0.5) = 0.10
-      overdueFeeRatio: 0.1, // (0.1 * 0.3) = 0.03
-      latenessRate: 0.0, // = 0.13 overall
+      attendanceRate: 0.8,
+      overdueFeeRatio: 0.1,
+      latenessRate: 0.0,
     };
     const result = calculateRuleBasedRisk(mediumStudent);
     expect(result.tier).toBe("medium");
@@ -48,8 +55,8 @@ describe("Risk Engine Math", () => {
   it("calculates high risk tier correctly at high threshold (>= 0.25)", () => {
     const highRiskStudent: Student = {
       ...baseStudent,
-      attendanceRate: 0.6, // (0.4 * 0.5) = 0.20
-      overdueFeeRatio: 0.3, // (0.3 * 0.3) = 0.09 -> sum 0.29
+      attendanceRate: 0.6,
+      overdueFeeRatio: 0.3,
       latenessRate: 0.1,
     };
     const result = calculateRuleBasedRisk(highRiskStudent);
@@ -58,9 +65,42 @@ describe("Risk Engine Math", () => {
   });
 
   it("getRiskInsight defaults to rule-based evaluation in rule mode", async () => {
+    process.env.NEXT_PUBLIC_AI_MODE = "rule";
     const result = await getRiskInsight(baseStudent);
     expect(result.studentId).toBe("std-test-1");
     expect(result.tier).toBe("low");
+  });
+
+  it("getRiskInsight fetches API response when NEXT_PUBLIC_AI_MODE=api and handles successful response", async () => {
+    process.env.NEXT_PUBLIC_AI_MODE = "api";
+    const mockRisk = calculateRuleBasedRisk(baseStudent);
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockRisk,
+    } as Response);
+
+    const result = await getRiskInsight(baseStudent);
+    expect(result.studentId).toBe("std-test-1");
+  });
+
+  it("getRiskInsight falls back to rule-based score on API fetch error", async () => {
+    process.env.NEXT_PUBLIC_AI_MODE = "api";
+    global.fetch = vi.fn().mockRejectedValue(new Error("Network Error"));
+
+    const result = await getRiskInsight(baseStudent);
+    expect(result.studentId).toBe("std-test-1");
+    expect(result.tier).toBe("low");
+  });
+
+  it("getRiskInsight falls back to rule-based score on API non-ok status", async () => {
+    process.env.NEXT_PUBLIC_AI_MODE = "api";
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as Response);
+
+    const result = await getRiskInsight(baseStudent);
+    expect(result.studentId).toBe("std-test-1");
   });
 });
 
@@ -115,6 +155,13 @@ describe("Timetable Conflict Detection", () => {
     expect(doSessionsOverlap(session1, sessionOverlap)).toBe(true);
   });
 
+  it("returns false if session compared to itself or different days", () => {
+    expect(doSessionsOverlap(session1, session1)).toBe(false);
+    expect(
+      doSessionsOverlap(session1, { ...sessionOverlap, dayOfWeek: "Tuesday" })
+    ).toBe(false);
+  });
+
   it("detects conflicts in a list of sessions", () => {
     const conflicts = detectTimetableConflicts([
       session1,
@@ -123,7 +170,7 @@ describe("Timetable Conflict Detection", () => {
     ]);
     expect(conflicts.has("s1")).toBe(true);
     expect(conflicts.has("s3")).toBe(true);
-    expect(conflicts.has("s2")).toBe(true); // s3 overlaps both s1 and s2!
+    expect(conflicts.has("s2")).toBe(true);
   });
 });
 
@@ -141,5 +188,12 @@ describe("Formatters", () => {
   it("formats dates gracefully", () => {
     expect(formatDate("2026-08-14")).toContain("Aug");
     expect(formatDate("invalid-date")).toBe("invalid-date");
+    expect(formatDate("")).toBe("");
+  });
+});
+
+describe("API Client Interceptors", () => {
+  it("initializes apiClient with base settings", () => {
+    expect(apiClient.defaults.timeout).toBe(10000);
   });
 });

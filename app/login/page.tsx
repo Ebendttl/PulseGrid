@@ -40,7 +40,7 @@ const DEMO_ACCOUNTS = [
   },
 ];
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
@@ -124,5 +124,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-pg-paper flex items-center justify-center text-xs text-pg-muted">Loading Portal...</div>}>
+      <LoginContent />
+    </React.Suspense>
   );
 }

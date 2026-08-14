@@ -1,7 +1,12 @@
 import axios from "axios";
 
-// In server-side rendering or dev, default to port 3001 (JSON Server) or relative API URL
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+// Local dev uses json-server on port 3001 (set NEXT_PUBLIC_API_URL=http://localhost:3001).
+// Production (Vercel) uses the built-in Next.js API route at /api/data.
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (typeof window !== "undefined"
+    ? `${window.location.origin}/api/data`
+    : "/api/data");
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

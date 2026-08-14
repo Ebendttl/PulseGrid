@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -14,15 +14,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setSelectedCategory, setComposerOpen } from "@/store/notificationsSlice";
 import { apiClient } from "@/lib/apiClient";
-import { Announcement, AnnouncementCategory } from "@/types/domain";
+import { Announcement } from "@/types/domain";
 import { formatDate } from "@/lib/formatters";
 import { toast } from "sonner";
 import {
-  Bell,
   Plus,
   Pin,
-  Calendar,
-  UserCheck,
   ChevronDown,
   ChevronUp,
   Megaphone,

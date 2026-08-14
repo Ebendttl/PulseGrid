@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --pg-ink: #10131A;
+  --pg-paper: #F6F7F5;
+  --pg-surface: #FFFFFF;
+  --pg-line: #E1E4E1;
+  --pg-signal-blue: #1D4ED8;
+  --pg-pulse-teal: #0F9D8C;
+  --pg-alert-amber: #C77D14;
+  --pg-risk-red: #C0362C;
+  --pg-muted: #6B7280;
+
+  --background: var(--pg-paper);
+  --foreground: var(--pg-ink);
+}
+
+.dark {
+  --pg-ink: #F6F7F5;
+  --pg-paper: #0B0D10;
+  --pg-surface: #14171C;
+  --pg-line: #242830;
+  --pg-signal-blue: #3B82F6;
+  --pg-pulse-teal: #14B8A6;
+  --pg-alert-amber: #F59E0B;
+  --pg-risk-red: #EF4444;
+  --pg-muted: #9CA3AF;
+
+  --background: var(--pg-paper);
+  --foreground: var(--pg-ink);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-pg-ink: var(--pg-ink);
+  --color-pg-paper: var(--pg-paper);
+  --color-pg-surface: var(--pg-surface);
+  --color-pg-line: var(--pg-line);
+  --color-pg-signal-blue: var(--pg-signal-blue);
+  --color-pg-pulse-teal: var(--pg-pulse-teal);
+  --color-pg-alert-amber: var(--pg-alert-amber);
+  --color-pg-risk-red: var(--pg-risk-red);
+  --color-pg-muted: var(--pg-muted);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), monospace;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
 }
+
+/* Tabular mono numbers for data grids & financial figures */
+.font-mono-tabular {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Flat cockpit shadows */
+.shadow-flat {
+  box-shadow: 0 1px 2px rgba(16, 19, 26, 0.06);
+}
+
+.dark .shadow-flat {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 2px solid var(--pg-signal-blue);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

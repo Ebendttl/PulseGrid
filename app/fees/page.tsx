@@ -341,6 +341,32 @@ export default function FeesPage() {
           </CardContent>
         </Card>
 
+        {/* Transaction History Activity Card */}
+        {transactions.length > 0 && (
+          <Card className="shadow-flat">
+            <CardHeader>
+              <CardTitle className="text-base">Recent Transaction Activity</CardTitle>
+              <CardDescription>Verified payment ledger entries</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {transactions.map((txn) => (
+                <div
+                  key={txn.id}
+                  className="p-3 rounded-[6px] border border-pg-line bg-pg-paper/30 flex items-center justify-between text-xs font-mono-tabular"
+                >
+                  <div>
+                    <span className="font-semibold text-pg-ink">{txn.reference}</span>
+                    <span className="text-pg-muted ml-2">({txn.paymentMethod})</span>
+                  </div>
+                  <div className="font-bold text-pg-pulse-teal">
+                    +{formatCurrency(txn.amount)}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Mock Payment Dialog (Zod validated) */}
         <Dialog open={paymentModalOpen} onOpenChange={(open) => dispatch(setPaymentModalOpen(open))}>
           <DialogContent>

@@ -6,6 +6,15 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 [![Deployment](https://img.shields.io/badge/Vercel-Live_App-success?logo=vercel)](https://pulse-grid-sigma.vercel.app)
+[![Presentation Slides](https://img.shields.io/badge/Presentation_Slides-PDF-red?logo=adobe-acrobat-reader)](https://github.com/Ebendttl/PulseGrid/blob/main/docs/PulseGrid_Presentation_Slides.pdf)
+
+---
+
+## 📑 Presentation & Project Deliverables
+
+- 📊 **Presentation Slides Deck (PDF):** [PulseGrid_Presentation_Slides.pdf](https://github.com/Ebendttl/PulseGrid/blob/main/docs/PulseGrid_Presentation_Slides.pdf)
+- 🌐 **Live Web Application:** [https://pulse-grid-sigma.vercel.app](https://pulse-grid-sigma.vercel.app)
+- 🐙 **GitHub Source Repository:** [https://github.com/Ebendttl/PulseGrid](https://github.com/Ebendttl/PulseGrid)
 
 ---
 

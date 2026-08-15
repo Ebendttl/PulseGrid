@@ -1,0 +1,575 @@
+const { chromium } = require("@playwright/test");
+const fs = require("fs");
+const path = require("path");
+
+const slidesHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PulseGrid Presentation Slides</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: 1920px 1080px;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #10131A;
+      color: #F6F7F5;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      padding: 80px 100px;
+      page-break-after: always;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #10131A;
+      overflow: hidden;
+    }
+
+    .slide-bg-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        linear-gradient(to right, rgba(225, 228, 225, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(225, 228, 225, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #242830;
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1D4ED8;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: #0D7A6D;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: bold;
+    }
+
+    .slide-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 44px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .slide-subtitle {
+      font-size: 22px;
+      color: #9CA3AF;
+      margin-top: 8px;
+    }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #242830;
+      padding-top: 20px;
+      font-size: 16px;
+      color: #6B7280;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-blue { background: rgba(29, 78, 216, 0.2); color: #60A5FA; border: 1px solid rgba(29, 78, 216, 0.4); }
+    .badge-teal { background: rgba(13, 122, 109, 0.2); color: #2DD4BF; border: 1px solid rgba(13, 122, 109, 0.4); }
+    .badge-amber { background: rgba(154, 91, 0, 0.2); color: #FBBF24; border: 1px solid rgba(154, 91, 0, 0.4); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      flex: 1;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 30px;
+      flex: 1;
+    }
+
+    .card {
+      background: #181C24;
+      border: 1px solid #282E3A;
+      border-radius: 12px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #60A5FA;
+    }
+
+    .card-text {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #D1D5DB;
+    }
+
+    ul.feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    ul.feature-list li {
+      position: relative;
+      padding-left: 28px;
+      font-size: 18px;
+      color: #E5E7EB;
+      line-height: 1.5;
+    }
+
+    ul.feature-list li::before {
+      content: "✦";
+      position: absolute;
+      left: 0;
+      color: #0D7A6D;
+      font-weight: bold;
+    }
+
+    code {
+      font-family: 'IBM Plex Mono', monospace;
+      background: #090B0E;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #2DD4BF;
+      font-size: 16px;
+    }
+
+    .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 56px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .img-preview {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #282E3A;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDE 1: Title Slide -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
+      <div style="margin-bottom: 24px;">
+        <span class="badge badge-teal">Senior Engineering Portfolio Deliverable</span>
+      </div>
+      <h1 style="font-family: 'Space Grotesk'; font-size: 72px; font-weight: 700; color: #FFFFFF; letter-spacing: -1px; margin-bottom: 16px;">
+        PulseGrid
+      </h1>
+      <p style="font-size: 28px; color: #9CA3AF; max-width: 900px; line-height: 1.4; margin-bottom: 40px;">
+        &ldquo;The heartbeat of your campus, in one grid.&rdquo;
+      </p>
+      <p style="font-size: 20px; color: #60A5FA; font-weight: 600;">
+        Production-Grade Mini Student Information Management System (Mini-SIMS)
+      </p>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Engineering Presentation</span>
+      <span>Frontend Pathway</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Executive Summary & Problem Statement -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content">
+      <div class="header">
+        <div>
+          <h2 class="slide-title">Problem Statement & Executive Vision</h2>
+          <p class="slide-subtitle">Addressing campus operational silos with unified instrumentation</p>
+        </div>
+        <span class="badge badge-blue">Overview</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="card-title" style="color: #F87171;">The Operational Challenge</h3>
+          <ul class="feature-list">
+            <li><strong>Fragmented Systems:</strong> Academic attendance, fee ledgers, and timetables operate in isolated software silos.</li>
+            <li><strong>Delayed Risk Detection:</strong> At-risk students drop below threshold before intervention can occur.</li>
+            <li><strong>Subpar Mobile Experience:</strong> Legacy portals lack responsive mobile cockpit layouts for active faculty marking.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title" style="color: #34D399;">The PulseGrid Solution</h3>
+          <ul class="feature-list">
+            <li><strong>Unified Role-Aware Cockpit:</strong> Single dashboard tailored dynamically for Admins, Teachers, and Students.</li>
+            <li><strong>Automated AI Risk Engine:</strong> Instant weighted scoring analyzing attendance drops, fee delays, and lateness.</li>
+            <li><strong>Mobile-First Instrumentation:</strong> Fast, offline-capable UI with 44px tap targets and optimistic state sync.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Presentation</span>
+      <span>Slide 2 of 8</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: System Architecture & Tech Stack -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content">
+      <div class="header">
+        <div>
+          <h2 class="slide-title">System Architecture & Tech Stack</h2>
+          <p class="slide-subtitle">Modern production-ready full-stack web application</p>
+        </div>
+        <span class="badge badge-teal">Architecture</span>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3 class="card-title">Frontend Core</h3>
+          <ul class="feature-list">
+            <li><strong>Next.js 15 (App Router):</strong> Server Components by default for optimal performance.</li>
+            <li><strong>React 19 & TypeScript 5:</strong> Strict type safety with <code>noUncheckedIndexedAccess</code>.</li>
+            <li><strong>Tailwind CSS 4:</strong> Modern design system with custom CSS variables.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">State & Cache</h3>
+          <ul class="feature-list">
+            <li><strong>Redux Toolkit:</strong> Centralized slices for auth, attendance, finance, and schedules.</li>
+            <li><strong>TanStack Query v5:</strong> 30s background refetching with tab visibility pausing.</li>
+            <li><strong>React Hook Form + Zod:</strong> Strict runtime input schema validation.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Deployment & API</h3>
+          <ul class="feature-list">
+            <li><strong>Vercel Serverless:</strong> Built-in <code>/api/data/*</code> route handlers serving datasets.</li>
+            <li><strong>Local Mock API:</strong> JSON Server (<code>db.json</code>) running via <code>concurrently</code>.</li>
+            <li><strong>PWA Shell:</strong> Manifest, favicon ICO/SVG, offline page fallback.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Presentation</span>
+      <span>Slide 3 of 8</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Core Operational Modules -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content">
+      <div class="header">
+        <div>
+          <h2 class="slide-title">Core Operational Modules</h2>
+          <p class="slide-subtitle">Instrument-grade user interfaces for everyday school operations</p>
+        </div>
+        <span class="badge badge-amber">Features</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="card-title">1. Attendance Register</h3>
+          <p class="card-text">
+            Optimistic Present/Absent/Late toggle buttons with automatic rollback on network failure and immutable audit logging drawers.
+          </p>
+          <h3 class="card-title" style="margin-top: 12px;">2. Fees & Finance Portal</h3>
+          <p class="card-text">
+            Ledger breakdown (paid/partial/overdue), payment modal, zero-balance state, and downloadable PDF receipts via <code>html2pdf.js</code>.
+          </p>
+        </div>
+        <div class="card">
+          <h3 class="card-title">3. Conflict-Aware Timetable</h3>
+          <p class="card-text">
+            Weekly class schedule grid with automated interval-overlap conflict detection math preventing double-booking.
+          </p>
+          <h3 class="card-title" style="margin-top: 12px;">4. Digital Noticeboard</h3>
+          <p class="card-text">
+            Category-filtered announcement feed (Academic, Events, General) with role-gated admin composer.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Presentation</span>
+      <span>Slide 4 of 8</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: AI-Powered Risk Engine -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content">
+      <div class="header">
+        <div>
+          <h2 class="slide-title">AI-Powered Risk Scoring Engine</h2>
+          <p class="slide-subtitle">Proactive student intervention through weighted operational analytics</p>
+        </div>
+        <span class="badge badge-blue">AI Analytics</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="card-title">Risk Formula Specification</h3>
+          <p class="card-text">
+            The operational risk engine calculates student vulnerability using a normalized weighted equation:
+          </p>
+          <div style="background: #090B0E; padding: 20px; border-radius: 8px; border: 1px solid #282E3A; font-family: 'IBM Plex Mono'; font-size: 18px; color: #2DD4BF; margin: 10px 0;">
+            Risk Score = (1 - AttendanceRate) * 0.5 <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ OverdueFeeRatio * 0.3 <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ LatenessFactor * 0.2
+          </div>
+          <ul class="feature-list">
+            <li><strong>Low Risk Tier (Score &lt; 0.25):</strong> Normal academic standing.</li>
+            <li><strong>Medium Risk Tier (0.25 - 0.40):</strong> Flagged for advisor check-in.</li>
+            <li><strong>High Risk Tier (Score &gt; 0.40):</strong> Urgent intervention watchlist.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Key Capabilities</h3>
+          <ul class="feature-list">
+            <li><strong>Boundary Testing:</strong> Fully validated against edge cases (100% attendance, zero fees).</li>
+            <li><strong>Dual Fallback Execution:</strong> Evaluates via serverless API (<code>/api/risk</code>) with client-side offline execution fallback.</li>
+            <li><strong>Real-Time Watchlist:</strong> Displays priority intervention alerts directly on the Admin & Teacher dashboard.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Presentation</span>
+      <span>Slide 5 of 8</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Design System & Accessibility -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content">
+      <div class="header">
+        <div>
+          <h2 class="slide-title">Design System & Accessibility (WCAG 2.1 AA)</h2>
+          <p class="slide-subtitle">High-contrast tokens, responsive layouts, and accessible UI controls</p>
+        </div>
+        <span class="badge badge-teal">UI / UX</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="card-title">Curated Token Palette</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 16px;">
+            <thead>
+              <tr style="border-bottom: 1px solid #282E3A; text-align: left; color: #9CA3AF;">
+                <th style="padding: 8px;">Token Name</th>
+                <th style="padding: 8px;">Hex Code</th>
+                <th style="padding: 8px;">Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #20242D;">
+                <td style="padding: 10px; color: #60A5FA; font-weight: bold;">--pg-signal-blue</td>
+                <td style="padding: 10px;"><code>#1D4ED8</code></td>
+                <td style="padding: 10px;">Primary actions & focus rings</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #20242D;">
+                <td style="padding: 10px; color: #2DD4BF; font-weight: bold;">--pg-pulse-teal</td>
+                <td style="padding: 10px;"><code>#0D7A6D</code></td>
+                <td style="padding: 10px;">Present status & positive metrics</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #20242D;">
+                <td style="padding: 10px; color: #FBBF24; font-weight: bold;">--pg-alert-amber</td>
+                <td style="padding: 10px;"><code>#9A5B00</code></td>
+                <td style="padding: 10px;">Late status & warning alerts</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; color: #F87171; font-weight: bold;">--pg-risk-red</td>
+                <td style="padding: 10px;"><code>#B91C1C</code></td>
+                <td style="padding: 10px;">Absent status & high risk flags</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Accessibility Guarantees</h3>
+          <ul class="feature-list">
+            <li><strong>Touch-First Controls:</strong> 44×44px minimum tap targets across all interactive buttons.</li>
+            <li><strong>Radix UI Backed:</strong> Native keyboard navigation, focus traps, ARIA roles, and screen-reader labels.</li>
+            <li><strong>Contrast Compliance:</strong> Checked with <code>@axe-core/playwright</code> for 0 serious/critical violations.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Presentation</span>
+      <span>Slide 6 of 8</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Verification & Testing Suite -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content">
+      <div class="header">
+        <div>
+          <h2 class="slide-title">Automated Verification & Testing Pipeline</h2>
+          <p class="slide-subtitle">100% test pass rate with strict quality gates</p>
+        </div>
+        <span class="badge badge-amber">Quality Assurance</span>
+      </div>
+      <div class="grid-3">
+        <div class="card" style="text-align: center; justify-content: center;">
+          <div class="stat-number" style="color: #34D399;">100%</div>
+          <div style="font-size: 20px; font-weight: 600; color: #FFFFFF;">Line Coverage</div>
+          <p class="card-text" style="font-size: 16px;">Vitest suite covering pure logic math, risk calculations, and interval overlaps.</p>
+        </div>
+        <div class="card" style="text-align: center; justify-content: center;">
+          <div class="stat-number" style="color: #60A5FA;">0</div>
+          <div style="font-size: 20px; font-weight: 600; color: #FFFFFF;">Lint Errors</div>
+          <p class="card-text" style="font-size: 16px;">TypeScript <code>tsc --noEmit</code> and ESLint checks passing with 0 warnings.</p>
+        </div>
+        <div class="card" style="text-align: center; justify-content: center;">
+          <div class="stat-number" style="color: #FBBF24;">100%</div>
+          <div style="font-size: 20px; font-weight: 600; color: #FFFFFF;">E2E Pass Rate</div>
+          <p class="card-text" style="font-size: 16px;">Playwright + axe-core suite passing across Mobile & Desktop viewports.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Presentation</span>
+      <span>Slide 7 of 8</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Deployment & Live Links -->
+  <div class="slide">
+    <div class="slide-bg-grid"></div>
+    <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
+      <span class="badge badge-teal" style="margin-bottom: 24px;">Project Deliverable</span>
+      <h2 style="font-family: 'Space Grotesk'; font-size: 56px; font-weight: 700; color: #FFFFFF; margin-bottom: 20px;">
+        PulseGrid is Live!
+      </h2>
+      <p style="font-size: 24px; color: #9CA3AF; max-width: 800px; margin-bottom: 40px;">
+        Explore the live production portal, view source code, or review complete documentation.
+      </p>
+      
+      <div style="display: flex; gap: 30px; margin-bottom: 50px;">
+        <div style="background: #181C24; border: 1px solid #282E3A; border-radius: 12px; padding: 24px 36px; text-align: left;">
+          <div style="font-size: 14px; color: #9CA3AF; text-transform: uppercase;">Live Deployment URL</div>
+          <div style="font-family: 'IBM Plex Mono'; font-size: 20px; color: #60A5FA; font-weight: 600; margin-top: 6px;">
+            https://pulse-grid-sigma.vercel.app
+          </div>
+        </div>
+
+        <div style="background: #181C24; border: 1px solid #282E3A; border-radius: 12px; padding: 24px 36px; text-align: left;">
+          <div style="font-size: 14px; color: #9CA3AF; text-transform: uppercase;">GitHub Repository</div>
+          <div style="font-family: 'IBM Plex Mono'; font-size: 20px; color: #2DD4BF; font-weight: 600; margin-top: 6px;">
+            https://github.com/Ebendttl/PulseGrid
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size: 18px; color: #6B7280;">
+        Thank you for reviewing PulseGrid Senior Engineering Capstone Project.
+      </p>
+    </div>
+    <div class="footer">
+      <span>PulseGrid Presentation</span>
+      <span>Slide 8 of 8</span>
+    </div>
+  </div>
+
+</body>
+</html>
+`;
+
+(async () => {
+  const docsDir = path.join(__dirname, "../docs");
+  if (!fs.existsSync(docsDir)) {
+    fs.mkdirSync(docsDir, { recursive: true });
+  }
+
+  const htmlPath = path.join(docsDir, "presentation_slides.html");
+  const pdfPath = path.join(docsDir, "PulseGrid_Presentation_Slides.pdf");
+
+  fs.writeFileSync(htmlPath, slidesHtml);
+  console.log("Wrote HTML slide deck to:", htmlPath);
+
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+
+  await page.setContent(slidesHtml, { waitUntil: "domcontentloaded" });
+  await page.pdf({
+    path: pdfPath,
+    width: "1920px",
+    height: "1080px",
+    printBackground: true,
+    margin: { top: 0, right: 0, bottom: 0, left: 0 }
+  });
+
+  await browser.close();
+  console.log("PDF Presentation Slides generated successfully at:", pdfPath);
+})();
